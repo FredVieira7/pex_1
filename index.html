@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Calculadora de Consumo de Água</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f1f1f1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+            }
+            .container {
+                background-color: #fff;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                width: 100%;
+            }
+            h1 {
+                text-align: center;
+                margin-bottom: 1rem;
+                color: #333;
+                font-size: 1.6rem;
+            }
+            label {
+                display: block;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+                color: #555;
+            }
+            input[type="number"],
+            select,
+            #moradores {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 1rem;
+                background-color: #ffffff;
+                color: #000000;
+            }
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            input[type="number"] {
+                -moz-appearance: textfield;
+            }
+            button {
+                margin-top: 1.5rem;
+                padding: 0.75rem;
+                width: 100%;
+                background-color: #2f855a;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 1rem;
+            }
+            button:hover {
+                background-color: #276749;
+            }
+            #resultado {
+                margin-top: 1.5rem;
+                background-color: #ffffff;
+                padding: 1rem;
+                border-radius: 5px;
+                font-weight: bold;
+                text-align: center;
+                color: #2d3748;
+            }
+            .dica-verde {
+                color: green;
+            }
+            .dica-amarela {
+                color: #d69e2e;
+            }
+            .dica-vermelha {
+                color: red;
+            }
+            .consumo-destaque {
+                font-size: 1.3rem;
+            }
+            ul {
+                text-align: left;
+                margin-top: 0.75rem;
+                padding-left: 1.25rem;
+            }
+            .toggle-container {
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+                margin-left: 8px;
+            }
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.4s;
+                border-radius: 24px;
+            }
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #2f855a;
+            }
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+            .dark-mode {
+                background-color: #1a202c;
+            }
+            .dark-mode .container {
+                background-color: #2d3748;
+                color: #f7fafc;
+            }
+            .dark-mode h1,
+            .dark-mode label {
+                color: #ffffff;
+            }
+            .dark-mode input,
+            .dark-mode select {
+                background-color: #ffffff;
+                color: #000000;
+                border: 1px solid #a0aec0;
+            }
+            .dark-mode #resultado {
+                background-color: #ffffff;
+                color: #2d3748;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="toggle-container">
+                <label for="darkModeToggle">Modo escuro</label>
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        id="darkModeToggle"
+                        onchange="toggleDarkMode()"
+                    />
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <h1>Calculadora de Consumo de Água</h1>
+            <label for="moradores">Quantas pessoas moram na casa?</label>
+            <input
+                type="number"
+                id="moradores"
+                min="1"
+                max="15"
+                value="1"
+                oninput="validarInput(this)"
+            />
+
+            <label for="estado">Selecione seu estado:</label>
+            <select id="estado">
+                <option value="">Selecione</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+            </select>
+
+            <label for="banho">Banhos por dia (máx: 50):</label>
+            <input
+                type="number"
+                id="banho"
+                min="0"
+                max="50"
+                placeholder="Ex: 2"
+                oninput="validarInput(this)"
+            />
+
+            <label for="descarga">Descargas por dia (máx: 50):</label>
+            <input
+                type="number"
+                id="descarga"
+                min="0"
+                max="50"
+                placeholder="Ex: 5"
+                oninput="validarInput(this)"
+            />
+
+            <label for="torneira"
+                >Minutos com torneira aberta (máx: 150):</label
+            >
+            <input
+                type="number"
+                id="torneira"
+                min="0"
+                max="150"
+                placeholder="Ex: 10"
+                oninput="validarInput(this)"
+            />
+
+            <button onclick="calcularConsumo()">Calcular</button>
+            <div id="resultado"></div>
+        </div>
+
+        <script>
+            const tarifasPorEstado = {
+                AC: 4.1,
+                AL: 3.7,
+                AP: 3.9,
+                AM: 4.2,
+                BA: 3.8,
+                CE: 4.0,
+                DF: 5.0,
+                ES: 4.4,
+                GO: 4.2,
+                MA: 3.6,
+                MT: 4.1,
+                MS: 3.9,
+                MG: 3.9,
+                PA: 4.0,
+                PB: 3.7,
+                PR: 4.5,
+                PE: 4.1,
+                PI: 3.8,
+                RJ: 4.8,
+                RN: 3.9,
+                RS: 4.3,
+                RO: 4.0,
+                RR: 3.6,
+                SC: 4.5,
+                SP: 5.2,
+                SE: 3.7,
+                TO: 3.8,
+            };
+
+            function validarInput(input) {
+                const min = parseInt(input.min);
+                const max = parseInt(input.max);
+                let valor = parseInt(input.value);
+                if (isNaN(valor) || valor < min) input.value = min;
+                else if (valor > max) input.value = max;
+            }
+
+            function calcularConsumo() {
+                const estado = document.getElementById("estado").value;
+                const moradores =
+                    parseInt(document.getElementById("moradores").value) || 1;
+                const banho =
+                    parseInt(document.getElementById("banho").value) || 0;
+                const descarga =
+                    parseInt(document.getElementById("descarga").value) || 0;
+                const torneira =
+                    parseInt(document.getElementById("torneira").value) || 0;
+
+                const litrosPorBanho = 45;
+                const litrosPorDescarga = 12;
+                const litrosPorMinutoTorneira = 3;
+
+                const litrosBanho = banho * litrosPorBanho * moradores;
+                const litrosDescarga = descarga * litrosPorDescarga * moradores;
+                const litrosTorneira =
+                    torneira * litrosPorMinutoTorneira * moradores;
+                const totalLitros =
+                    litrosBanho + litrosDescarga + litrosTorneira;
+
+                if (!estado || !tarifasPorEstado[estado]) {
+                    document.getElementById(
+                        "resultado"
+                    ).innerHTML = `Por favor, selecione um estado válido.`;
+                    return;
+                }
+
+                const valorLitro = tarifasPorEstado[estado] / 1000;
+                const custoMensal = (totalLitros * valorLitro * 30).toFixed(2);
+
+                let dica = "";
+                let dicaClasse = "";
+                if (totalLitros / moradores <= 150) {
+                    dica =
+                        "Excelente! Seu consumo está dentro da média sustentável.";
+                    dicaClasse = "dica-verde";
+                } else if (totalLitros / moradores <= 300) {
+                    dica = "Seu consumo está razoável, mas pode ser otimizado.";
+                    dicaClasse = "dica-amarela";
+                } else {
+                    dica =
+                        "Consumo elevado! Considere reduzir o tempo de uso de água.";
+                    dicaClasse = "dica-vermelha";
+                }
+
+                document.getElementById("resultado").innerHTML = `
+                    <div class="consumo-destaque">Consumo estimado: ${totalLitros} litros por dia (${(
+                    totalLitros / moradores
+                ).toFixed(0)} por pessoa).</div><br><br>
+                    Gasto mensal estimado: R$ ${custoMensal}<br><br>
+                    <span class="${dicaClasse}">Dica: ${dica}</span><br><br>
+                    <ul>
+                        <li>Reduza o tempo de banho para economizar água aquecida.</li>
+                        <li>Utilize descargas com duplo acionamento ou economize nas descargas.</li>
+                        <li>Feche a torneira enquanto escova os dentes ou lava a louça.</li>
+                    </ul>`;
+            }
+
+            function toggleDarkMode() {
+                document.body.classList.toggle("dark-mode");
+            }
+        </script>
+    </body>
+</html>
